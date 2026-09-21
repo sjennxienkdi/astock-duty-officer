@@ -1,0 +1,90 @@
+{
+  "note": "展示模式 cassette：选股角色的录制回合。工具调用与交卷内容都是录的，图/权限/配额/EVIDENCE 是真的。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/PACK.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "000001"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "300750"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "688001"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "gm_kline",
+          "args": {
+            "code": "300750"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "vertical_search",
+          "args": {
+            "query": "002456"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/POOL-DRAFT.md",
+            "content": "# POOL-DRAFT · 2026-09-15\nas_of: 2026-09-15T23:52:00+08:00\nproduced_by: screener（T-1 夜深研究）\n\n## 000001 平安银行\n理由: 半年报案净息差企稳，流动性充足 [vertical_search@2026-09-15]\n\n## 300750 宁德时代\n理由: 储能订单放量，量能连续抬升 [gm_kline@2026-09-15]\n\n## 002456 欧菲光\n理由: 跌幅已深，只看技术面反弹，基本面存疑\n\n## 688001 华兴源创\n理由: 设备订单口径不清，先挂草稿\n\n## 新码清单（近 10 交易日无 DD 档）\n- 300750\n- 002456\n- 688001\n\n已持仓 600519 次日必须强制入池，不依赖本草稿。\n"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/CANDIDATES.md",
+            "content": "# CANDIDATES · 2026-09-16\nas_of: 2026-09-16T08:12:00+08:00\nproduced_by: screener（T 晨修正）\n\n## 600519 贵州茅台\nheld: true\ndd_ref: 无背调\nnote: 持仓强制入池，不可剔除\n\n## 000001 平安银行\nheld: false\ndd_ref: 无背调\nnote: 净息差企稳，流动性达标 [vertical_search@2026-09-15]\n\n## 300750 宁德时代\nheld: false\ndd_ref: DD/300750/2026-09-15.md\nnote: 储能订单放量，量能抬升 [gm_kline@2026-09-15]\n\n## 002456 欧菲光\nheld: false\ndd_ref: DD/002456/2026-09-15.md\nnote: 仅技术面理由\n\n## 688001 华兴源创\nheld: false\ndd_ref: 无背调\nnote: 订单口径不清\nlow_info: true\n"
+          }
+        }
+      ]
+    },
+    {
+      "content": "池草稿与晨间终稿已交，5 只入池，3 只新码待背调。"
+    }
+  ]
+}

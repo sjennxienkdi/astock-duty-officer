@@ -1,0 +1,39 @@
+{
+  "note": "展示模式 cassette：资讯角色。只产索引，不下结论。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/PACK.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "vertical_search",
+          "args": {
+            "query": "300750"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/EVENT-INDEX.md",
+            "content": "# EVENT-INDEX · 2026-09-16\nas_of: 2026-09-16T07:58:00+08:00\nproduced_by: news（旁挂 · 下游可不用）\n\n| 事件 | 受影响标的 | 来源 | 时间戳 |\n|---|---|---|---|\n| 储能订单放量（示例） | 300750 | vertical_search | 2026-09-15 |\n| 半年报案净息差企稳（示例） | 000001 | vertical_search | 2026-09-15 |\n| 证监会立案告知书（示例） | 002456 | vertical_search | 2026-09-14 |\n| 季度出货节奏平稳（示例） | 600519 | vertical_search | 2026-09-15 |\n\n未入索引：2026-09-01 的产能扩张旧闻，超 3 个交易日时效门槛。\n本文件不含任何判断，也不构成闸门。\n"
+          }
+        }
+      ]
+    },
+    {
+      "content": "索引已交，4 条入表、1 条因时效未入。"
+    }
+  ]
+}

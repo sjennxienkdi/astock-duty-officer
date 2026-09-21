@@ -1,0 +1,60 @@
+{
+  "note": "展示模式 cassette：背调角色。七条齐全，只打标记，无否决权。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/CANDIDATES.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "tianyancha_flags",
+          "args": {
+            "code": "300750"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "tianyancha_flags",
+          "args": {
+            "code": "002456"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/DD/300750/2026-09-15.md",
+            "content": "# DD · 300750 宁德时代 · 2026-09-15\nproduced_by: diligence（T-1 夜档 1/2）\n\n- 质押: 无\n- 失信: 无\n- 诉讼: 无\n- 开庭: 2026-11-03 一起买卖合同纠纷开庭\n- 终本: 无\n- 解禁: 无\n- 对外担保: 对子公司担保余额占净资产 6%（示例）\n\nhard_red: false\nflags: 无\n结论: 未见硬雷，开庭事项为常规经营性诉讼，供决策参考，不构成否决。\n"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/DD/002456/2026-09-15.md",
+            "content": "# DD · 002456 欧菲光 · 2026-09-15\nproduced_by: diligence（T-1 夜档 2/2）\n\n- 质押: 控股股东质押 62%，未触及爆仓线\n- 失信: 无\n- 诉讼: 证监会立案调查（信息披露违规）\n- 开庭: 无\n- 终本: 无\n- 解禁: 无\n- 对外担保: 无\n\nhard_red: true\nflags: case_investigation\n结论: 命中立案调查，按规则上报引擎在次日池锁定浅筛处置。我没有否决权。\n"
+          }
+        }
+      ]
+    },
+    {
+      "content": "夜档两只已交，其中 002456 标记 hard_red 交引擎处置；新码 688001 配额用尽，标无背调。"
+    }
+  ]
+}

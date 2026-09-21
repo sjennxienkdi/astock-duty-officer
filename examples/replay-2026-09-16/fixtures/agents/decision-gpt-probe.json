@@ -1,0 +1,38 @@
+{
+  "note": "权限探针：1 号决策实例试图读 2 号原文，必须被 FilesystemPermission 拒绝。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/DECISION-claude.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/REVIEW-deepseek.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/CANDIDATES.md"
+          }
+        }
+      ]
+    },
+    {
+      "content": "两次越权读取被拒，第三次合法。"
+    }
+  ]
+}

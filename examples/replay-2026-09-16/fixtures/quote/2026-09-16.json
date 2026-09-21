@@ -1,0 +1,32 @@
+{
+  "600519": {
+    "name": "贵州茅台",
+    "price_cents": 150000,
+    "prev_close_cents": 148000,
+    "volume_lots": 31200
+  },
+  "000001": {
+    "name": "平安银行",
+    "price_cents": 1200,
+    "prev_close_cents": 1195,
+    "volume_lots": 120000
+  },
+  "300750": {
+    "name": "宁德时代",
+    "price_cents": 18500,
+    "prev_close_cents": 17200,
+    "volume_lots": 88000
+  },
+  "002456": {
+    "name": "欧菲光",
+    "price_cents": 980,
+    "prev_close_cents": 995,
+    "volume_lots": 45000
+  },
+  "688001": {
+    "name": "华兴源创",
+    "price_cents": 2450,
+    "prev_close_cents": 2440,
+    "volume_lots": 1800
+  }
+}

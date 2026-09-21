@@ -1,0 +1,59 @@
+{
+  "note": "展示模式 cassette：1 号决策实例（tag=gpt）。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/CANDIDATES.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/DD/300750/2026-09-15.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "quote_snapshot",
+          "args": {
+            "code": "000001"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "300750"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/DECISION-gpt.md",
+            "content": "# DECISION · 2026-09-16 · gpt\nas_of: 2026-09-16T08:40:00+08:00\npool_version: 2026-09-16-0820\n\n## 600519 贵州茅台\nstance: 持有\nconfidence: high\ndd_ref: 无背调\nevidence:\n  - \"[vertical_search@2026-09-15] 季度出货节奏平稳（示例）\"\nreasoning: 出货节奏平稳 [vertical_search@2026-09-15]，没有需要动的理由。\n\n## 000001 平安银行\nstance: 建仓\nconfidence: medium\ndd_ref: 无背调\nevidence:\n  - \"[vertical_search@2026-09-15] 净息差企稳（示例）\"\n  - \"[ifind_panel@2026-09-16] 流动性达标\"\nreasoning: 息差企稳 [vertical_search@2026-09-15] 且流动性达标 [ifind_panel@2026-09-16]，可开新仓。\n\n## 300750 宁德时代\nstance: 建仓\nconfidence: medium\ndd_ref: DD/300750/2026-09-15.md\nevidence:\n  - \"[gm_kline@2026-09-15] 量能连续抬升\"\nreasoning: 订单放量 [ifind_panel@2026-09-16]，量能抬升 [gm_kline@2026-09-15]，未见硬雷。\n"
+          }
+        }
+      ]
+    },
+    {
+      "content": "1 号交卷：3 只 stance 已出，未算任何仓位。"
+    }
+  ]
+}

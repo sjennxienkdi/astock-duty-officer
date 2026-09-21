@@ -1,0 +1,71 @@
+{
+  "note": "展示模式 cassette：调度角色的尾盘回合。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/INTRADAY.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/ALERT.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/REVIEW-deepseek.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/NOON.md",
+            "content": "# NOON · 2026-09-16\nproduced_by: director（11:32 稀疏死门）\n\n上午两件事：300750 两次触发引擎的波动阈值并进入盘中提案；000001 的建仓单已在确认页放行。\n下午 13:00 起恢复低频盯盘，无新议题。\n"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/EVENTS-POSITIONS.md",
+            "content": "# EVENTS-POSITIONS · 2026-09-16\nproduced_by: director\n\n## 与持仓相关的事件\n- 300750：盘中两次 move 命中（引擎判定），13:10 起回落阈值内，调频已回到 5min。\n- 000001：无事件，提案链未触发。\n- 600519：无事件。\n\n## 与池相关但今天没做的事\n- 002456 于 08:20 被浅筛移出（立案调查），全天未再进入任何判断。\n- 688001 未过 edge gate（缩量），已标无背调。\n"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/SUMMARY.md",
+            "content": "# SUMMARY · 2026-09-16\nproduced_by: director（15:12）\n\n## 今天做了什么\n一笔建仓（000001），其余全部按引擎的精确持有执行，零换仓。\n\n## 结论段（进研究记忆 KB）\n1. 串行漏斗下，持仓股强制入池这条规则第一次真正救回了卖出通道：600519 之所以被判断，\n   不是因为它进了选股草稿，而是因为它是持仓。\n2. 三票极差 ≥2 回落中性，事后看是对的——300750 尾盘涨幅收窄到 +3%以内，\n   两号看多一号看空的日子不该由票数多的一方单独定价。\n3. 背调无否决权这条设计成立：002456 的立案调查由 diligence 上报、由引擎在次日锁池时移出，\n   职责没有混。\n\n## 明天关注\n- 300750 是否二次脉冲；若是，说明今天的回落规则偏保守，需要复看。\n- 688001 若量能恢复要重新入池，但它仍无背调档。\n\n## 盈亏与执行回顾\n数字全部见引擎账本与 MORNING.md，本文件不复述。\n"
+          }
+        }
+      ]
+    },
+    {
+      "content": "收盘文档三件已交。"
+    }
+  ]
+}

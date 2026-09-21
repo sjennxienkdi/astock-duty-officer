@@ -1,0 +1,59 @@
+{
+  "note": "展示模式 cassette：复核角色。系统提示词与权限都禁止它读 DECISION-*，本回合也不试读。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/MORNING.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/CANDIDATES.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/DD/300750/2026-09-15.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "quote_snapshot",
+          "args": {
+            "code": "000001"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/REVIEW-deepseek.md",
+            "content": "# REVIEW · 2026-09-16 · deepseek\nas_of: 2026-09-16T09:05:00+08:00\n输入: 池 + DD + 引擎锁定计划（未读任何 DECISION）\n\n## 对计划本身的意见\n- 000001 建仓：流动性与报表口径都支持 [quote_snapshot@2026-09-16]，同意引擎给的这条。\n- 300750 冲突回落为持有：三票极差超过 1，回落是中性的，符合规则，不再复议。\n- 600519 维持现仓：非换仓日，零订单。\n\n## 独立判断（先于计划形成）\n我若独立出票，只会对 000001 给同一个方向；对 300750 我不会在跳空日追。\n\n## 结论\n计划可执行，无需人工重议。LOW_INFO 不适用。\n"
+          }
+        }
+      ]
+    },
+    {
+      "content": "复核已交，全程未读决策原文。"
+    }
+  ]
+}

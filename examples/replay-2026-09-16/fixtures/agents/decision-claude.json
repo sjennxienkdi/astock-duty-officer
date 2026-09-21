@@ -1,0 +1,49 @@
+{
+  "note": "展示模式 cassette：2 号决策实例（tag=claude）。与 1 号独立，互相读不到。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/CANDIDATES.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "vertical_search",
+          "args": {
+            "query": "000001"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "quote_snapshot",
+          "args": {
+            "code": "300750"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/DECISION-claude.md",
+            "content": "# DECISION · 2026-09-16 · claude\nas_of: 2026-09-16T08:41:00+08:00\npool_version: 2026-09-16-0820\n\n## 600519 贵州茅台\nstance: 持有\nconfidence: high\ndd_ref: 无背调\nevidence:\n  - \"[quote_snapshot@2026-09-16] 价格与昨收差异在常态区间\"\nreasoning: 波动在常态区间 [quote_snapshot@2026-09-16]，不动。\n\n## 000001 平安银行\nstance: 建仓\nconfidence: high\ndd_ref: 无背调\nevidence:\n  - \"[vertical_search@2026-09-15] 半年报案净息差企稳（示例）\"\nreasoning: 报表口径改善 [vertical_search@2026-09-15]，愿意开新仓。\n\n## 300750 宁德时代\nstance: 持有\nconfidence: low\ndd_ref: DD/300750/2026-09-15.md\nevidence:\n  - \"[quote_snapshot@2026-09-16] 已大幅跳空\"\nreasoning: 跳空之后追价风险与收益不对称 [quote_snapshot@2026-09-16]。LOW_INFO\n"
+          }
+        }
+      ]
+    },
+    {
+      "content": "2 号交卷。"
+    }
+  ]
+}

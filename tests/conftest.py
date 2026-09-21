@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
 
 import pytest
 
+from duty_agent.agents import RoleRun, decision, diligence, director, news, review, screener, watch
+from duty_agent.config import Settings
+from duty_agent.planner import IntradayBudget, Planner, build_planner
 from duty_engine.aggregate import Stance
 from duty_engine.clock import VirtualClock, shanghai
 from duty_engine.freeze import (
@@ -38,6 +42,7 @@ RED_CODE = "300001"
 ST_CODE = "000002"
 SMALL_CODE = "688001"
 CASH_CENTS = 85_000_000
+GOLDEN_CODES = (HELD_CODE, FRESH_CODE, "300750", "002456", "688001")
 
 MakeDecision = Callable[[str, tuple[DecisionEntry, ...], Pool], DecisionFile]
 MakeEntry = Callable[[str, str, Stance], DecisionEntry]
@@ -155,3 +160,86 @@ def gate() -> EdgeGate:
 @pytest.fixture
 def clock() -> VirtualClock:
     return VirtualClock(shanghai(2026, 9, 16, "07:00:00"))
+
+
+@pytest.fixture
+def settings(tmp_path: Path) -> Settings:
+    """展示模式配置：档案与库落在 tmp，数据源指向 examples。"""
+    return Settings(
+        display_mode=True,
+        results_dir=tmp_path / "results",
+        examples_dir=EXAMPLES,
+        db_path=tmp_path / "duty.sqlite3",
+        outbox_dir=tmp_path / "outbox",
+        kb_index_path=tmp_path / "kb.sqlite3",
+        portfolio_cents=100_000_000,
+    )
+
+
+@pytest.fixture
+def planner(settings: Settings) -> Planner:
+    return build_planner(settings, DAY)
+
+
+@pytest.fixture
+def golden_day(planner: Planner) -> GoldenDay:
+    """跑完整金日子：从采集到收盘文档。"""
+    return run_golden_day(planner)
+
+
+def run_golden_day(p: Planner) -> GoldenDay:
+    """按 plan §3.2 把一天跑完，返回引擎产物与各角色交卷清单。"""
+    runs: list[RoleRun] = []
+    p.stage("pack_collect")
+    p.collect_pack(DAY)
+    p.stage("screener_revise")
+    runs.append(p.run_role(screener.SPEC, DAY, ask="出今天的池"))
+    runs.append(p.run_role(news.SPEC, DAY, ask="读 PACK 出事件索引"))
+    p.stage("diligence_morning")
+    runs.append(p.run_role(diligence.SPEC, DAY, ask="给新码出背调"))
+    p.stage("lock_pool")
+    pool = p.lock_pool(DAY)
+    p.stage("decision_window")
+    for tag in p.settings.tags:
+        runs.append(
+            p.run_role(
+                decision.spec_for_tag(tag),
+                DAY,
+                ask="对池内标的出 stance",
+                cassette=f"decision-{tag}",
+            )
+        )
+    p.stage("lock_plan")
+    plan = p.lock_plan(DAY, pool, p.settings.tags)
+    p.stage("plan_doc")
+    runs.append(p.run_role(director.SPEC, DAY, ask="写人话计划与对垒"))
+    p.stage("review")
+    runs.append(p.run_role(review.SPEC, DAY, ask="独立复核引擎锁定的计划"))
+    p.stage("intraday_watch")
+    runs.append(p.run_role(watch.SPEC, DAY, ask="记录盘中现象"))
+    triggered = tuple(p.monitor_round(plan, DAY))
+    budget = IntradayBudget(p.settings.intraday.per_code, p.settings.intraday.global_max)
+    granted, _ = p.intraday_proposal(plan, budget, "300750")
+    if granted:
+        runs.append(
+            p.run_role(
+                decision.spec_for_tag("gpt"),
+                DAY,
+                ask="对已入计划标的出盘中提案",
+                cassette="decision-gpt-intraday",
+            )
+        )
+    p.stage("daily_summary")
+    runs.append(p.run_role(director.SPEC, DAY, ask="写午报与收盘日报", cassette="director-close"))
+    return GoldenDay(planner=p, pool=pool, plan=plan, runs=tuple(runs), triggered=triggered)
+
+
+@dataclass(frozen=True)
+class GoldenDay:
+    """金日回放结果。"""
+
+    planner: Planner
+    pool: Pool
+    plan: Plan
+    runs: tuple[RoleRun, ...]
+    triggered: tuple[str, ...]

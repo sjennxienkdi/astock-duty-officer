@@ -1,0 +1,64 @@
+{
+  "note": "展示模式 cassette：盯盘角色。只记现象，零归因，不读任何档案。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "quote_snapshot",
+          "args": {
+            "code": "300750"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/INTRADAY.md",
+            "append": true,
+            "content": "09:35 轮次1 300750 现价 18500 分，较昨收 +756bps，成交 88000 手（引擎判定：move 命中，阈值 300bps）"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "quote_snapshot",
+          "args": {
+            "code": "000001"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/INTRADAY.md",
+            "append": true,
+            "content": "09:40 轮次2 000001 现价 1200 分，较昨收 +42bps，成交 120000 手（引擎判定：未命中）"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/INTRADAY.md",
+            "append": true,
+            "content": "09:45 轮次3 300750 现价 18420 分，较昨收 +709bps，成交 91000 手（引擎判定：move 命中，调频 5min→1min）"
+          }
+        }
+      ]
+    },
+    {
+      "content": "三轮记录已追加，只写现象。"
+    }
+  ]
+}

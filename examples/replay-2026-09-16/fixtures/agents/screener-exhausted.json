@@ -1,0 +1,119 @@
+{
+  "note": "配额探针：iFinD 每次会话限 8 次，第 9 次必须被拒并逼出 LOW_INFO，而不是编一个答案。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "600519"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "000001"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "300750"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "002456"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "688001"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "600519"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "000001"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "300750"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "002456"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "ifind_panel",
+          "args": {
+            "code": "688001"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/CANDIDATES.md",
+            "content": "# CANDIDATES · 2026-09-16\nas_of: 2026-09-16T08:18:00+08:00\nlow_info: true\n\n## 600519 贵州茅台\nheld: true\ndd_ref: 无背调\nnote: 持仓强制入池\n\n## 688001 华兴源创\nheld: false\ndd_ref: 无背调\nnote: 配额耗尽，面板未取全\nlow_info: true\n"
+          }
+        }
+      ]
+    },
+    {
+      "content": "配额耗尽，按已有信息出池并打 LOW_INFO。"
+    }
+  ]
+}

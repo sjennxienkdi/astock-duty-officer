@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import sqlite3
+import threading
 from contextlib import closing
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
 
 from duty_engine.clock import ensure_shanghai
+
+# 档案是单写者语义：并行工具调用也必须串行落盘，否则追加顺序不确定。
+_WRITE_LOCK = threading.Lock()
 
 # plan §4.1 / §5.1 / §5.4 / §5.5 的告警类别 + 池外标的越权一类
 ALERT_KINDS = frozenset({"absent", "volatility", "sig001", "hard_red", "cooldown", "offpool"})
@@ -174,15 +178,19 @@ class Archive:
 
     def append(self, day: date, name: str, line: str) -> Path:
         target = self.path(day, name)
-        with target.open("a", encoding="utf-8") as handle:
-            handle.write(line.rstrip("\n") + "\n")
+        with _WRITE_LOCK:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with target.open("a", encoding="utf-8") as handle:
+                handle.write(line.rstrip("\n") + "\n")
         return target
 
     def write_once(self, day: date, name: str, text: str) -> Path:
         target = self.path(day, name)
-        if target.exists():
-            raise FileExistsError(f"档案只追加，禁止覆盖: {target}")
-        target.write_text(text.rstrip("\n") + "\n", encoding="utf-8")
+        with _WRITE_LOCK:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if target.exists():
+                raise FileExistsError(f"档案只追加，禁止覆盖: {target}")
+            target.write_text(text.rstrip("\n") + "\n", encoding="utf-8")
         return target
 
     def read(self, day: date, name: str) -> str:

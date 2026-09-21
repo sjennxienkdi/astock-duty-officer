@@ -1,0 +1,38 @@
+{
+  "note": "权限探针：复核角色试图读决策原文防锚定线，必须被拒。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/DECISION-gpt.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/INTRADAY-DECISION-gpt.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/MORNING.md"
+          }
+        }
+      ]
+    },
+    {
+      "content": "禁读线生效，合法输入仍可读。"
+    }
+  ]
+}

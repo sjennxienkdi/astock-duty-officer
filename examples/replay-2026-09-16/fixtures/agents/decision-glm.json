@@ -1,0 +1,49 @@
+{
+  "note": "展示模式 cassette：3 号决策实例（tag=glm）。与 300750 上故意与前两号分歧，用来演示聚合冲突回落。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/CANDIDATES.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "gm_kline",
+          "args": {
+            "code": "300750"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "vertical_search",
+          "args": {
+            "query": "600519"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/DECISION-glm.md",
+            "content": "# DECISION · 2026-09-16 · glm\nas_of: 2026-09-16T08:43:00+08:00\npool_version: 2026-09-16-0820\n\n## 600519 贵州茅台\nstance: 持有\nconfidence: medium\ndd_ref: 无背调\nevidence:\n  - \"[vertical_search@2026-09-15] 出货节奏平稳（示例）\"\nreasoning: 没有变化信号 [vertical_search@2026-09-15]。\n\n## 000001 平安银行\nstance: 持有\nconfidence: medium\ndd_ref: 无背调\nevidence:\n  - \"[gm_kline@2026-09-15] 近五日无异常\"\nreasoning: 改善还没走到价格上 [gm_kline@2026-09-15]，不抢跑。\n\n## 300750 宁德时代\nstance: 减仓\nconfidence: medium\ndd_ref: DD/300750/2026-09-15.md\nevidence:\n  - \"[gm_kline@2026-09-15] 单日涨幅占五日全部\"\nreasoning: 五日涨幅集中在一天 [gm_kline@2026-09-15]，脉冲后回落概率高。\n"
+          }
+        }
+      ]
+    },
+    {
+      "content": "3 号交卷，与 1、2 号在 300750 上留了分歧。"
+    }
+  ]
+}

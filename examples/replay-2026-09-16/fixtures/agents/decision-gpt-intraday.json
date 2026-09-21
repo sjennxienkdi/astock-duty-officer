@@ -1,0 +1,39 @@
+{
+  "note": "展示模式 cassette：被 ALERT 激活的盘中决策回合。标的必须在已持仓/已冻结未成交范围内。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/INTRADAY.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "quote_snapshot",
+          "args": {
+            "code": "300750"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/INTRADAY-DECISION-gpt.md",
+            "content": "# DECISION · 2026-09-16 · gpt\nas_of: 2026-09-16T09:46:00+08:00\npool_version: 2026-09-16-0820\nwindow: intraday\n\n## 300750 宁德时代\nstance: 减仓\nconfidence: medium\ndd_ref: DD/300750/2026-09-15.md\nevidence:\n  - \"[quote_snapshot@2026-09-16] 引擎判定 move 命中两次\"\nreasoning: 盘中两次触发同一阈值 [quote_snapshot@2026-09-16]，脉冲特征明显。\n\n本次提案仅针对盘前已入计划的标的，未引入任何新码；等待人工确认。\n"
+          }
+        }
+      ]
+    },
+    {
+      "content": "盘中提案已交，走同一条 SIG-001 与人工确认链。"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "note": "展示模式 cassette：调度角色的早盘回合。它只写人话文档，仓位数字一律回指引擎原文。",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/MORNING.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/DECISION-gpt.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/DECISION-claude.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/DECISION-glm.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "args": {
+            "file_path": "/EVENT-INDEX.md"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/PLAN.md",
+            "content": "# PLAN · 2026-09-16\nproduced_by: director（人话版，数字请回看 MORNING.md）\n\n## 今天怎么做\n1. 只有一笔新开仓：000001 平安银行，方向来自 1 号与 2 号一致、3 号不反对；\n   具体买多少由引擎给（见 MORNING.md 的 target_bps），我不重复数字。\n2. 300750 宁德时代：三票极差超过 1，引擎按规则回落为持有。今天不动它，\n   分歧留到 CROSS_EXAM.md 呈现，不做裁决。\n3. 600519 贵州茅台：持仓股强制入池后聚合为持有，非换仓日，零订单。\n4. 002456 欧菲光在 08:20 被引擎浅筛移出池，原因是背调上报的立案调查——\n   注意这是规则否决，不是任何 agent 的否决。\n\n## 需要你确认\n只有第 1 条会产生订单，等你在确认页放行；其余今天没有任何待办。\n\n## 今天看不到的东西\n688001 华兴源创因缩量未过 edge gate；它和新码 002456 的背调档不存在，已标无背调。\n"
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_archive",
+          "args": {
+            "file_path": "/CROSS_EXAM.md",
+            "content": "# CROSS_EXAM · 2026-09-16\nproduced_by: director（只呈现，不裁决）\n\n## 300750 宁德时代——今日唯一实质分歧\n| 实例 | stance | 置信 | 理由摘要 |\n|---|---|---|---|\n| gpt | 建仓 | medium | 订单放量、量能抬升 |\n| claude | 持有 | low | 跳空后追价收益不对称，自标 LOW_INFO |\n| glm | 减仓 | medium | 五日涨幅集中一天，脉冲后回落概率高 |\n\n极差 2 ≥ 2，引擎按 §5.2 回落为持有并记 conflict=true。\n我不仲裁：三票都留着，收盘后由 SUMMARY.md 回看谁对。\n\n## 000001 平安银行\n三票为 建仓 / 建仓 / 持有，极差 1，取中位数建仓。\n\n## 600519 贵州茅台\n三票一致持有。\n"
+          }
+        }
+      ]
+    },
+    {
+      "content": "早班文档已交：PLAN.md 与 CROSS_EXAM.md，未产任何数字。"
+    }
+  ]
+}

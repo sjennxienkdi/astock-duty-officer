@@ -1,0 +1,27 @@
+{
+  "600519": {
+    "listed_days": 5200,
+    "avg_amount_cents": 90000000000,
+    "is_st": false
+  },
+  "000001": {
+    "listed_days": 8000,
+    "avg_amount_cents": 60000000000,
+    "is_st": false
+  },
+  "300750": {
+    "listed_days": 1900,
+    "avg_amount_cents": 120000000000,
+    "is_st": false
+  },
+  "002456": {
+    "listed_days": 3600,
+    "avg_amount_cents": 25000000000,
+    "is_st": false
+  },
+  "688001": {
+    "listed_days": 1500,
+    "avg_amount_cents": 300000000,
+    "is_st": false
+  }
+}

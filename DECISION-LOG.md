@@ -23,3 +23,14 @@
 | 2026-09-21 | M2：`ledger` 表不设 `position_bps` 列；仓位 bps 只存在于计划与目标里 | 账本记的是成交，bps 记的是计划，混在一列会出现第二个真相源 |
 | 2026-09-21 | M2：outbox 文件名为 `{YYYYMMDDTHHMMSS}-{kind}.md` 而非 §9 的 `{ts}.md` | 同一秒内多类卡片会互相覆盖，档案只追加（§15.7）优先于字面命名 |
 | 2026-09-21 | M2：`SIG-001` 命中由 app 侧置 `DecisionFile.voided`，`lock_plan` 见 voided 即整份跳过 | §11 把 sig001 放在 app、§5.1 把扫描放在计划锁定；引擎不反向依赖 app，用数据字段传门禁 |
+| 2026-09-21 | M3：展示模式用 cassette（`fixtures/agents/*.json`）驱动 `FakeChatModel`，图/权限/配额/EVIDENCE/引擎门禁全部真实执行，只有判断内容由录制回放提供 | §15.11 禁真实密钥 + §10 白名单无真实模型；等价于 VCR 回放，且是 `test_golden_day_*` 逐字节可重跑的前提 |
+| 2026-09-21 | M3：禁互读落在 deepagents `FilesystemPermission`（deny read 他人结论），不是提示词约定 | §4 的「禁互读 / 复核禁读 DECISION」必须可被测试证伪；已在 `test_decision_no_cross_read` `test_review_cannot_read_decision` 断言工具返回 permission-denied |
+| 2026-09-21 | M3：内置 `write_file` / `edit_file` / `delete` 同属 write 操作，整体 deny；交卷只能走 `submit_archive`（文件名白名单 + 只追加） | §15.7「不删档、不覆盖」在工具层成立，而不是靠约定；`delete` 属于写操作是 deepagents 的实现事实，顺势关掉 |
+| 2026-09-21 | M3：`CANDIDATES.md` 只含标的与理由，edge gate 用的上市天数/成交额/ST 由引擎从数据源适配器取 | §15.2 禁 LLM 输出金额类字段；让判断层产数字会同时踩红线和产生第二个真相源 |
+| 2026-09-21 | M3：SIG-001 的 `\b` 换成 `(?![0-9])`（`test_sig001_catches_cjk_without_word_boundary`） | `re` 下汉字与 `股`/`手` 同为 `\w`，「300股票」这类写法 `\b` 不成立会漏检；改后仍只匹配数字+单位 |
+| 2026-09-21 | M3：硬雷浅筛加否定检测（关键词前 3 字出现 未/无/不 即未命中） | 「未触及爆仓线」曾被判成命中并误移池；浅筛是规则否决，假阳性等于替 LLM 说了不存在的结论 |
+| 2026-09-21 | M3：cassette 每回合只放一个工具调用；档案追加加进程内写锁 | 并行工具调用让 `EVIDENCE-*.md` 行序不确定、Windows 上并发追加会掉行；回放型项目必须逐字节可重跑（`test_golden_day_is_byte_reproducible`） |
+| 2026-09-21 | M3：`EVIDENCE-{role}.md` 只记白名单取证工具调用，档案内 `read_file` 导航不记 | §5.3 的门槛针对外部来源；`director` 不取证因此没有 EVIDENCE 档，不是漏写 |
+| 2026-09-21 | M3：`Planner` 持 `VirtualClock` 并以 `stage(定时槽名)` 推进，代替固定「现在」 | EVIDENCE 与 ALERT 的时间戳要落回 §3.2 的真实节奏；agent 不挂钟（§15.5），推进动作本身仍由引擎时钟对象执行 |
+| 2026-09-21 | M3：复核实例 tag 取 `deepseek`（`REVIEW-deepseek.md`） | §2.2 冻结的是 `REVIEW-{tag}.md` 模板，tag 本身未冻结；与决策三实例区分开以便 Replay 页展示 |
+| 2026-09-21 | M3：`examples/replay-2026-09-16/` 的 27 份全天档案由代码跑出来的，并由 `test_examples_match_golden_day_replay` 钉住 | 手写示例档案必然与实现漂移；DoD 要求 Replay 页能完整回放，先保证它是真产物 |

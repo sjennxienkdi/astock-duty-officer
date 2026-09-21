@@ -12,3 +12,7 @@
   ledger（整数分 / 整数 bps）、orders（十态表驱动转移矩阵）、clock（§3.2 节奏表 + 虚拟时钟）、
   freeze（08:20 池锁定 / 08:45 计划锁定 + DECISION 解析 + MORNING 渲染）、aggregate（stance
   聚合与冲突回落）、monitor（盘中三判定 + 调频）、push_dispatcher（四类卡片限次与 outbox 回退）。
+- M3：agent 层 `duty_agent`——graph（deepagents 装配、六个白名单工具、cassette 驱动的展示模型、
+  文件级读取门禁）、planner（§3.2 编排、收卷与作废、盘中护栏、确认链）、config（配额/阈值/时刻）、
+  七个角色模块、四个 guardrail 模块（sig001 / hard_red / source_adjudicator / intent_guard）。
+  `examples/replay-2026-09-16/` 落地 27 份可逐字节重跑的全天档案与 fixtures。
