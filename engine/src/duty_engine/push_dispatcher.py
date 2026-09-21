@@ -93,5 +93,5 @@ class PushDispatcher:
     def _write_outbox(self, event: PushEvent, body: str) -> Path:
         self.outbox_dir.mkdir(parents=True, exist_ok=True)
         target = self.outbox_dir / self._outbox_name(event)
-        target.write_text(body.rstrip("\n") + "\n", encoding="utf-8")
+        target.write_text(body.rstrip("\n") + "\n", encoding="utf-8", newline="\n")
         return target

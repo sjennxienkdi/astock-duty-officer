@@ -46,7 +46,7 @@ class TurnLedger:
             raise ValueError(f"未知轮次来源: {origin}")
         turn = Turn(new_intent_id(), ensure_shanghai(at), origin, text)
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.path.open("a", encoding="utf-8") as handle:
+        with self.path.open("a", encoding="utf-8", newline="\n") as handle:
             handle.write(json.dumps(turn.__dict__, ensure_ascii=False, default=str) + "\n")
         return turn
 

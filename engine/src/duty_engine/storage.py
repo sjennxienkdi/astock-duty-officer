@@ -180,7 +180,7 @@ class Archive:
         target = self.path(day, name)
         with _WRITE_LOCK:
             target.parent.mkdir(parents=True, exist_ok=True)
-            with target.open("a", encoding="utf-8") as handle:
+            with target.open("a", encoding="utf-8", newline="\n") as handle:
                 handle.write(line.rstrip("\n") + "\n")
         return target
 
@@ -190,7 +190,7 @@ class Archive:
             target.parent.mkdir(parents=True, exist_ok=True)
             if target.exists():
                 raise FileExistsError(f"档案只追加，禁止覆盖: {target}")
-            target.write_text(text.rstrip("\n") + "\n", encoding="utf-8")
+            target.write_text(text.rstrip("\n") + "\n", encoding="utf-8", newline="\n")
         return target
 
     def read(self, day: date, name: str) -> str:
