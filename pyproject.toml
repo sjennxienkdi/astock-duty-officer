@@ -31,7 +31,7 @@ python_version = "3.11"
 strict = true
 namespace_packages = true
 explicit_package_bases = true
-mypy_path = ["app/src", "engine/src", "scripts"]
+mypy_path = ["app/src", "engine/src", "scripts", "tests"]
 files = ["app/src", "engine/src", "web", "tests", "scripts"]
 
 [[tool.mypy.overrides]]
