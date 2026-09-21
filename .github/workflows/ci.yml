@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --frozen
+      - name: 脱敏终检 (plan §16)
+        run: uv run python scripts/check_secrets.py
+      - name: 测试
+        run: >
+          uv run pytest -q --cov=duty_agent --cov=duty_engine
+          --cov-report=term-missing --cov-report=xml

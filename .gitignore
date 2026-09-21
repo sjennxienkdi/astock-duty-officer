@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# uv / venv
+.venv/
+uv.lock.bak
+
+# 工具缓存
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# 运行时产物（档案与 outbox 不入库，示例档案在 examples/ 下另存）
+results/
+outbox/
+*.sqlite3
+*.db
+
+# 环境
+.env
+.env.local
+
+# 系统
+.DS_Store
+Thumbs.db

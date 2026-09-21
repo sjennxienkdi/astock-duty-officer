@@ -1,0 +1,28 @@
+name: Docs
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 必备文档存在
+        run: |
+          for f in README.md ARCHITECTURE.md SAFETY.md EVALUATION.md DECISION-LOG.md CHANGELOG.md LICENSE plan.md; do
+            test -s "$f" || { echo "缺失或为空: $f"; exit 1; }
+          done
+      - name: README/ARCHITECTURE 首屏主链图与 plan §3.1 逐字一致
+        run: uv run --no-project python scripts/check_diagram.py

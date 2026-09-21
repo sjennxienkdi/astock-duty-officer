@@ -1,0 +1,43 @@
+[project]
+name = "astock-duty-officer"
+version = "0.1.0"
+description = "A股值班台 · 基于 Deep Agents 的多智能体参考实现"
+requires-python = "==3.11.*"
+dependencies = ["duty-agent", "duty-engine", "streamlit>=1.40"]
+
+[dependency-groups]
+dev = ["pytest", "pytest-cov", "ruff", "mypy"]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+duty-agent = { workspace = true }
+duty-engine = { workspace = true }
+
+[tool.uv.workspace]
+members = ["app", "engine"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["app/src", "engine/src", "web", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = ["app/src", "engine/src", "scripts"]
+files = ["app/src", "engine/src", "web", "tests", "scripts"]
+
+[[tool.mypy.overrides]]
+module = ["streamlit.*", "requests.*", "rank_bm25.*", "sqlite_vec.*", "deepagents.*", "langchain_mcp_adapters.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
