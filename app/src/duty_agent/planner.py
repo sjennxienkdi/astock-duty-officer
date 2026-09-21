@@ -11,11 +11,13 @@ from typing import Any
 
 from duty_agent.agents import RoleRun, RoleSpec
 from duty_agent.config import Settings
-from duty_agent.graph import RunContext, run_role
+from duty_agent.graph import RecallFn, RunContext, run_role
 from duty_agent.guardrails.hard_red import scan_dd
 from duty_agent.guardrails.intent_guard import TurnLedger, verify
 from duty_agent.guardrails.sig001 import hits, scan
 from duty_agent.guardrails.source_adjudicator import QuotaMeter
+from duty_agent.memory.ingest import ingest
+from duty_agent.memory.store import KbStore
 from duty_engine.clock import SCHEDULE, TZ_SHANGHAI, VirtualClock
 from duty_engine.freeze import (
     Candidate,
@@ -177,7 +179,9 @@ class Planner:
             self.archive.write_once(day, "PACK.md", text)
         return text
 
-    def run_context(self, spec: RoleSpec, day: date) -> RunContext:
+    def run_context(
+        self, spec: RoleSpec, day: date, *, recall: RecallFn | None = None
+    ) -> RunContext:
         quota = self.settings.quota
         return RunContext.build(
             role=spec.role,
@@ -192,16 +196,23 @@ class Planner:
                 }
             ),
             clock=lambda: self.now,
+            recall=recall,
         )
 
     def run_role(
-        self, spec: RoleSpec, day: date, *, ask: str, cassette: str | None = None
+        self,
+        spec: RoleSpec,
+        day: date,
+        *,
+        ask: str,
+        cassette: str | None = None,
+        recall: RecallFn | None = None,
     ) -> RoleRun:
         """跑一个角色到交卷。cassette 默认与角色同名。"""
         path = self.settings.examples_dir / "fixtures" / "agents" / f"{cassette or spec.role}.json"
         return run_role(
             spec,
-            self.run_context(spec, day),
+            self.run_context(spec, day, recall=recall),
             path,
             root_dir=self.archive.daily_dir(day),
             ask=ask,
@@ -338,6 +349,16 @@ class Planner:
         if not granted:
             self.alert_log.emit(Alert(self.now, "cooldown", code, reason))
         return granted, reason
+
+    def backup_and_ingest(self, day: date, kb: KbStore) -> int:
+        """15:30：把当日结论性档案增量写入 KB（plan §3.2 / §6）。"""
+        self.stage("backup_and_ingest")
+        return ingest(
+            kb,
+            self.archive.daily_dir(day),
+            self.settings.examples_dir / "fixtures" / "quant-lab",
+            day.isoformat(),
+        )
 
     def confirm(self, order: Order, intent_id: str, *, to: OrderState = OrderState.QUEUED) -> Order:
         """唯一放行口：intent_id 必须来自真实用户轮次。"""

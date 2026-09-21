@@ -34,3 +34,10 @@
 | 2026-09-21 | M3：`Planner` 持 `VirtualClock` 并以 `stage(定时槽名)` 推进，代替固定「现在」 | EVIDENCE 与 ALERT 的时间戳要落回 §3.2 的真实节奏；agent 不挂钟（§15.5），推进动作本身仍由引擎时钟对象执行 |
 | 2026-09-21 | M3：复核实例 tag 取 `deepseek`（`REVIEW-deepseek.md`） | §2.2 冻结的是 `REVIEW-{tag}.md` 模板，tag 本身未冻结；与决策三实例区分开以便 Replay 页展示 |
 | 2026-09-21 | M3：`examples/replay-2026-09-16/` 的 27 份全天档案由代码跑出来的，并由 `test_examples_match_golden_day_replay` 钉住 | 手写示例档案必然与实现漂移；DoD 要求 Replay 页能完整回放，先保证它是真产物 |
+| 2026-09-21 | M4：KB 向量与 chunk id 的哈希一律用 `zlib.crc32`，不用内置 `hash()` | `hash()` 受 PYTHONHASHSEED 随机化，跨进程会让落盘的 embedding 与查询向量错位，KB 隔天就废 |
+| 2026-09-21 | M4：向量索引 sqlite-vec 可用则用、不可用则 numpy 余弦；连接以 `check_same_thread=False` 打开 | §6 已规定回退；langgraph 在工作线程里执行工具，同线程限制会直接抛 ProgrammingError |
+| 2026-09-21 | M4：中文分词用「单字 + bigram + ASCII 词」，不引分词器依赖 | §10 白名单无分词库；20 条金标下 recall@5 = 0.90，够用且完全确定 |
+| 2026-09-21 | M4：embedding 用确定性 hash 向量，不接任何 embedding 服务 | 与 M1 决策一致：白名单无 embedding 项、§15.11 禁真实密钥 |
+| 2026-09-21 | M4：`recall` 不受 3 个交易日时效门槛约束（`NEWS_TOOLS` 只含 `vertical_search`） | §6 明确 KB 收的就是跨日结论与结题卡，对它们套时效等于否认 KB 的立论；KB 引用仍须带 `[doc@as_of]` 且在白名单内 |
+| 2026-09-21 | M4：`eval.py` 的指标度量检索质量，因此不加 `filters`；过滤强制只落在 agent 侧 `recall_tool` | §6 的强制过滤是给 agent 的入口约束，金标集若被过滤预先切小语料，指标就不再反映索引本身 |
+| 2026-09-21 | M4：15:30 的 `backup_and_ingest` 由 planner 调用 KB，写入数即返回值 | §3.2 把 ingest 挂在备份之后；展示模式没有备份目标，只落索引 |

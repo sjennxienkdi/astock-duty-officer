@@ -1,5 +1,5 @@
 {
-  "note": "展示模式 cassette：1 号决策实例（tag=gpt）。",
+  "note": "展示模式 cassette：1 号决策实例（tag=gpt）。含一次 KB 召回，演示旁挂记忆被引用而非依赖。",
   "turns": [
     {
       "tool_calls": [
@@ -44,10 +44,22 @@
     {
       "tool_calls": [
         {
+          "name": "recall",
+          "args": {
+            "query": "跳空 确认 右侧末端 动量 拥挤",
+            "doc_type": "experiment",
+            "code": ""
+          }
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
           "name": "submit_archive",
           "args": {
             "file_path": "/DECISION-gpt.md",
-            "content": "# DECISION · 2026-09-16 · gpt\nas_of: 2026-09-16T08:40:00+08:00\npool_version: 2026-09-16-0820\n\n## 600519 贵州茅台\nstance: 持有\nconfidence: high\ndd_ref: 无背调\nevidence:\n  - \"[vertical_search@2026-09-15] 季度出货节奏平稳（示例）\"\nreasoning: 出货节奏平稳 [vertical_search@2026-09-15]，没有需要动的理由。\n\n## 000001 平安银行\nstance: 建仓\nconfidence: medium\ndd_ref: 无背调\nevidence:\n  - \"[vertical_search@2026-09-15] 净息差企稳（示例）\"\n  - \"[ifind_panel@2026-09-16] 流动性达标\"\nreasoning: 息差企稳 [vertical_search@2026-09-15] 且流动性达标 [ifind_panel@2026-09-16]，可开新仓。\n\n## 300750 宁德时代\nstance: 建仓\nconfidence: medium\ndd_ref: DD/300750/2026-09-15.md\nevidence:\n  - \"[gm_kline@2026-09-15] 量能连续抬升\"\nreasoning: 订单放量 [ifind_panel@2026-09-16]，量能抬升 [gm_kline@2026-09-15]，未见硬雷。\n"
+            "content": "# DECISION · 2026-09-16 · gpt\nas_of: 2026-09-16T08:40:00+08:00\npool_version: 2026-09-16-0820\n\n## 600519 贵州茅台\nstance: 持有\nconfidence: high\ndd_ref: 无背调\nevidence:\n  - \"[vertical_search@2026-09-15] 季度出货节奏平稳（示例）\"\nreasoning: 出货节奏平稳 [vertical_search@2026-09-15]，没有需要动的理由。\n\n## 000001 平安银行\nstance: 建仓\nconfidence: medium\ndd_ref: 无背调\nevidence:\n  - \"[vertical_search@2026-09-15] 净息差企稳（示例）\"\n  - \"[ifind_panel@2026-09-16] 流动性达标\"\nreasoning: 息差企稳 [vertical_search@2026-09-15] 且流动性达标 [ifind_panel@2026-09-16]，可开新仓。\n\n## 300750 宁德时代\nstance: 建仓\nconfidence: medium\ndd_ref: DD/300750/2026-09-15.md\nevidence:\n  - \"[gm_kline@2026-09-15] 量能连续抬升\"\n  - \"[qlab-0012@2026-08-29] 确认次数越多越靠近右侧末端\"\nreasoning: 订单放量 [ifind_panel@2026-09-16]，量能抬升 [gm_kline@2026-09-15]，未见硬雷；动量确认教训 [qlab-0012@2026-08-29] 提示这是右侧位置，置信度只给 medium。\n"
           }
         }
       ]

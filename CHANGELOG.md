@@ -16,3 +16,6 @@
   文件级读取门禁）、planner（§3.2 编排、收卷与作废、盘中护栏、确认链）、config（配额/阈值/时刻）、
   七个角色模块、四个 guardrail 模块（sig001 / hard_red / source_adjudicator / intent_guard）。
   `examples/replay-2026-09-16/` 落地 27 份可逐字节重跑的全天档案与 fixtures。
+- M4：研究记忆 KB——store（BM25 + sqlite-vec/numpy 双路 + RRF 融合）、ingest（`##` 分块、
+  frontmatter、time-bound 排除、SUMMARY 只取结论段）、recall_tool（强制 `doc_type` 或 `code`
+  过滤）、eval + 20 条金标集（recall@5 0.90 / MRR 0.663），决策实例当天真实召回并引用结题卡。

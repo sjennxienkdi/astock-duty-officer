@@ -53,6 +53,9 @@ def permissions_for(spec: RoleSpec) -> list[FilesystemPermission]:
     return rules
 
 
+RecallFn = Callable[[str, str, str], list[str]]
+
+
 @dataclass
 class RunContext:
     """一次角色运行的全部外部依赖。"""
@@ -64,7 +67,7 @@ class RunContext:
     evidence: EvidenceLog
     clock: Callable[[], datetime]
     wrote: list[str] = field(default_factory=list)
-    recall: Callable[[str, str, str], list[str]] | None = None
+    recall: RecallFn | None = None
 
     @classmethod
     def build(
@@ -76,7 +79,7 @@ class RunContext:
         archive: Archive,
         quota: QuotaMeter,
         clock: Callable[[], datetime],
-        recall: Callable[[str, str, str], list[str]] | None = None,
+        recall: RecallFn | None = None,
     ) -> RunContext:
         return cls(
             day=day,

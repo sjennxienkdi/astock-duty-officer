@@ -25,4 +25,5 @@ confidence: medium
 dd_ref: DD/300750/2026-09-15.md
 evidence:
   - "[gm_kline@2026-09-15] 量能连续抬升"
-reasoning: 订单放量 [ifind_panel@2026-09-16]，量能抬升 [gm_kline@2026-09-15]，未见硬雷。
+  - "[qlab-0012@2026-08-29] 确认次数越多越靠近右侧末端"
+reasoning: 订单放量 [ifind_panel@2026-09-16]，量能抬升 [gm_kline@2026-09-15]，未见硬雷；动量确认教训 [qlab-0012@2026-08-29] 提示这是右侧位置，置信度只给 medium。

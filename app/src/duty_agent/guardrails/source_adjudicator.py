@@ -23,7 +23,9 @@ SOURCE_WHITELIST = (
 STALE_AFTER_TRADING_DAYS = 3
 
 CITATION = re.compile(r"\[([a-z_]+)@([0-9]{4}-[0-9]{2}-[0-9]{2})(?:T[0-9:.+\-Z]+)?\]")
-NEWS_TOOLS = frozenset({"vertical_search", "recall"})
+# 只有资讯类证据受 3 个交易日时效门槛约束。KB 召回的结题卡与结论档本身就是跨日语义，
+# 对它们套时效等于否认 §6 的立论，因此 recall 不在这里过期，只查白名单。
+NEWS_TOOLS = frozenset({"vertical_search"})
 _REASONING = re.compile(r"^reasoning:\s*(.*)$")
 
 

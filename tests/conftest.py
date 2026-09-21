@@ -11,6 +11,9 @@ import pytest
 
 from duty_agent.agents import RoleRun, decision, diligence, director, news, review, screener, watch
 from duty_agent.config import Settings
+from duty_agent.memory.ingest import ingest
+from duty_agent.memory.recall_tool import tool_bridge
+from duty_agent.memory.store import KbStore
 from duty_agent.planner import IntradayBudget, Planner, build_planner
 from duty_engine.aggregate import Stance
 from duty_engine.clock import VirtualClock, shanghai
@@ -200,6 +203,10 @@ def run_golden_day(p: Planner) -> GoldenDay:
     p.stage("lock_pool")
     pool = p.lock_pool(DAY)
     p.stage("decision_window")
+    kb = KbStore(p.settings.kb_index_path)
+    kb.reset()
+    ingest(kb, EXAMPLES, EXAMPLES / "fixtures" / "quant-lab", DAY.isoformat())
+    bridge = tool_bridge(kb)
     for tag in p.settings.tags:
         runs.append(
             p.run_role(
@@ -207,6 +214,7 @@ def run_golden_day(p: Planner) -> GoldenDay:
                 DAY,
                 ask="对池内标的出 stance",
                 cassette=f"decision-{tag}",
+                recall=bridge,
             )
         )
     p.stage("lock_plan")
@@ -231,7 +239,12 @@ def run_golden_day(p: Planner) -> GoldenDay:
         )
     p.stage("daily_summary")
     runs.append(p.run_role(director.SPEC, DAY, ask="写午报与收盘日报", cassette="director-close"))
-    return GoldenDay(planner=p, pool=pool, plan=plan, runs=tuple(runs), triggered=triggered)
+    p.stage("backup_and_ingest")
+    added = p.backup_and_ingest(DAY, kb)
+    kb.close()
+    return GoldenDay(
+        planner=p, pool=pool, plan=plan, runs=tuple(runs), triggered=triggered, kb_added=added
+    )
 
 
 @dataclass(frozen=True)
@@ -243,3 +256,4 @@ class GoldenDay:
     plan: Plan
     runs: tuple[RoleRun, ...]
     triggered: tuple[str, ...]
+    kb_added: int = 0

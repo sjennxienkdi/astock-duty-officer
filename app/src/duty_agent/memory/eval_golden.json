@@ -1,0 +1,82 @@
+[
+  {
+    "question": "五日反转 实验轴 为什么关闭",
+    "expected_doc_ids": ["qlab-0008"]
+  },
+  {
+    "question": "反转效应 周频到月频 显著 日频 噪音",
+    "expected_doc_ids": ["qlab-0008"]
+  },
+  {
+    "question": "动量 连续五次确认 盈亏比 恶化 右侧末端",
+    "expected_doc_ids": ["qlab-0012"]
+  },
+  {
+    "question": "拥挤度 成交额占比 换手率分位 惩罚",
+    "expected_doc_ids": ["qlab-0012"]
+  },
+  {
+    "question": "TOM 趋势跟随动量 复现 IC 不显著",
+    "expected_doc_ids": ["qlab-0018"]
+  },
+  {
+    "question": "截面波动率分层 涨跌停 停牌 可交易截面 失真",
+    "expected_doc_ids": ["qlab-0018"]
+  },
+  {
+    "question": "缩量过滤 回撤刹车 不是收益来源",
+    "expected_doc_ids": ["qlab-0021"]
+  },
+  {
+    "question": "日均成交额 门槛 edge gate 池锁定 配置",
+    "expected_doc_ids": ["qlab-0021"]
+  },
+  {
+    "question": "涨停 炸板 次日反包 盈亏比 吃亏",
+    "expected_doc_ids": ["qlab-0024"]
+  },
+  {
+    "question": "市场情绪 状态判别器 高潮期 退潮期 循环论证",
+    "expected_doc_ids": ["qlab-0024"]
+  },
+  {
+    "question": "持仓股强制入池 卖出通道 结论",
+    "expected_doc_ids": ["SUMMARY@2026-09-16"]
+  },
+  {
+    "question": "三票 极差 回落 中性 事后看",
+    "expected_doc_ids": ["SUMMARY@2026-09-16"]
+  },
+  {
+    "question": "背调 无否决权 引擎 次日移池 职责",
+    "expected_doc_ids": ["SUMMARY@2026-09-16"]
+  },
+  {
+    "question": "300750 宁德时代 三票分歧 建仓 减仓 呈现",
+    "expected_doc_ids": ["CROSS_EXAM@2026-09-16"]
+  },
+  {
+    "question": "跳空 追价 风险与收益不对称 LOW_INFO",
+    "expected_doc_ids": ["CROSS_EXAM@2026-09-16"]
+  },
+  {
+    "question": "000001 平安银行 三票 中位数 建仓",
+    "expected_doc_ids": ["CROSS_EXAM@2026-09-16"]
+  },
+  {
+    "question": "盘中两次 move 命中 阈值 调频 回落",
+    "expected_doc_ids": ["EVENTS-POSITIONS@2026-09-16"]
+  },
+  {
+    "question": "002456 移出池 浅筛 全天未再进入判断",
+    "expected_doc_ids": ["EVENTS-POSITIONS@2026-09-16"]
+  },
+  {
+    "question": "宁德时代 背调 开庭 买卖合同纠纷 对外担保",
+    "expected_doc_ids": ["DD/300750@2026-09-15"]
+  },
+  {
+    "question": "欧菲光 背调 立案调查 控股股东质押 62%",
+    "expected_doc_ids": ["DD/002456@2026-09-15"]
+  }
+]
