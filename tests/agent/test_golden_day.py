@@ -85,6 +85,35 @@ def test_golden_day_triggers_intraday_alert(golden_day: GoldenDay) -> None:
     assert "kind=volatility 300750" in text
 
 
+def test_golden_day_dispatches_four_cards(golden_day: GoldenDay) -> None:
+    """四类卡片都走 outbox（webhook 未配置），且都是限次内的第一次。"""
+    kinds = [kind for kind, _ in golden_day.cards]
+    assert {"morning", "alert", "proposal", "summary"} == set(kinds)
+    assert all(channel == "outbox" for _, channel in golden_day.cards)
+    bodies = [
+        path.read_text(encoding="utf-8")
+        for path in golden_day.planner.settings.outbox_dir.glob("*.md")
+    ]
+    assert len(bodies) == len(kinds)
+    assert any("# 早盘决策卡" in body for body in bodies)
+    assert any("# 波动提案" in body for body in bodies)
+    assert any("# 日报" in body for body in bodies)
+    assert any("# 告警" in body for body in bodies)
+
+
+def test_golden_day_morning_card_separates_engine_from_comments(golden_day: GoldenDay) -> None:
+    morning = next(
+        path.read_text(encoding="utf-8")
+        for path in golden_day.planner.settings.outbox_dir.glob("*morning_decision.md")
+    )
+    assert "## 引擎判定（聚合后）" in morning
+    assert "## 引擎数字" in morning
+    assert "极差≥2 已回落中性" in morning
+    assert "移池淘汰 002456" in morning
+    assert "## 评论（agent 判断，不构成指令）" in morning
+    assert "卡片内没有确认按钮" in morning
+
+
 def _run_into(root: Path) -> dict[str, bytes]:
     settings = Settings(
         display_mode=True,

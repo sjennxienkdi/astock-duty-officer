@@ -219,6 +219,7 @@ def run_golden_day(p: Planner) -> GoldenDay:
         )
     p.stage("lock_plan")
     plan = p.lock_plan(DAY, pool, p.settings.tags)
+    cards: list[tuple[str, str]] = [("morning", p.push_morning(DAY, plan, pool).channel)]
     p.stage("plan_doc")
     runs.append(p.run_role(director.SPEC, DAY, ask="写人话计划与对垒"))
     p.stage("review")
@@ -226,6 +227,9 @@ def run_golden_day(p: Planner) -> GoldenDay:
     p.stage("intraday_watch")
     runs.append(p.run_role(watch.SPEC, DAY, ask="记录盘中现象"))
     triggered = tuple(p.monitor_round(plan, DAY))
+    verdict = p.store.alerts("volatility")[-1]["detail"] if triggered else ""
+    for code in triggered:
+        cards.append(("alert", p.push_alert("volatility", code, verdict).channel))
     budget = IntradayBudget(p.settings.intraday.per_code, p.settings.intraday.global_max)
     granted, _ = p.intraday_proposal(plan, budget, "300750")
     if granted:
@@ -235,15 +239,24 @@ def run_golden_day(p: Planner) -> GoldenDay:
                 DAY,
                 ask="对已入计划标的出盘中提案",
                 cassette="decision-gpt-intraday",
+                recall=bridge,
             )
         )
+        cards.append(("proposal", p.push_proposal(plan, "300750", Stance.TRIM, verdict).channel))
     p.stage("daily_summary")
     runs.append(p.run_role(director.SPEC, DAY, ask="写午报与收盘日报", cassette="director-close"))
+    cards.append(("summary", p.push_summary(DAY, plan, pool).channel))
     p.stage("backup_and_ingest")
     added = p.backup_and_ingest(DAY, kb)
     kb.close()
     return GoldenDay(
-        planner=p, pool=pool, plan=plan, runs=tuple(runs), triggered=triggered, kb_added=added
+        planner=p,
+        pool=pool,
+        plan=plan,
+        runs=tuple(runs),
+        triggered=triggered,
+        kb_added=added,
+        cards=tuple(cards),
     )
 
 
@@ -257,3 +270,4 @@ class GoldenDay:
     runs: tuple[RoleRun, ...]
     triggered: tuple[str, ...]
     kb_added: int = 0
+    cards: tuple[tuple[str, str], ...] = ()

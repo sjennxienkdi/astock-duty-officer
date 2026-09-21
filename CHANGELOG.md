@@ -19,3 +19,7 @@
 - M4：研究记忆 KB——store（BM25 + sqlite-vec/numpy 双路 + RRF 融合）、ingest（`##` 分块、
   frontmatter、time-bound 排除、SUMMARY 只取结论段）、recall_tool（强制 `doc_type` 或 `code`
   过滤）、eval + 20 条金标集（recall@5 0.90 / MRR 0.663），决策实例当天真实召回并引用结题卡。
+- M5：输出面——`web/` 五页（值班台 / 全天回放 / 人工确认 / 研究记忆 / 评测，`st.navigation`
+  装配，AppTest 无头覆盖）、`notify/` 四类企业微信卡片模板与通道、planner 的卡片分发链
+  （早盘决策卡 / 波动提案 / 日报 / 告警，含 §9 限次与 outbox 回退）。新增 `.streamlit/config.toml`
+  把值班台绑到本机回环。

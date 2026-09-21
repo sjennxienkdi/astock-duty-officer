@@ -34,13 +34,14 @@ class Renderer(Protocol):
 
 @dataclass(frozen=True)
 class PushEvent:
-    """一条待分发事件。`numbers` 必须全部来自引擎。"""
+    """一条待分发事件。`numbers` 与 `facts` 必须全部来自引擎。"""
 
     kind: str
     at: datetime
     subject: str
     numbers: Mapping[str, int]
     comments: tuple[str, ...] = ()
+    facts: tuple[str, ...] = ()
     confirm_url: str = ""
 
     def __post_init__(self) -> None:

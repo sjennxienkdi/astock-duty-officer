@@ -10,7 +10,15 @@ import pytest
 
 from conftest import DAY as GOLDEN_DATE
 from conftest import EXAMPLES, GoldenDay
-from duty_agent.memory.eval import RECALL_TARGET, build_store, evaluate, load_golden
+from duty_agent.memory.eval import (
+    RECALL_TARGET,
+    Metrics,
+    build_store,
+    evaluate,
+    load_golden,
+    main,
+    write_evaluation,
+)
 from duty_agent.memory.ingest import ingest, is_time_bound, parse_frontmatter, split_blocks
 from duty_agent.memory.recall_tool import Filters, as_citations, recall
 from duty_agent.memory.store import Chunk, KbStore, hash_embed, tokenize
@@ -148,3 +156,18 @@ def test_chunk_ids_are_stable() -> None:
     first = Chunk("d-1", "600519", "summary", DAY, "结论性档案", text)
     assert first.chunk_id == Chunk("d-1", "600519", "summary", DAY, "结论性档案", text).chunk_id
     assert first.citation == f"[d-1@{DAY}]"
+
+
+def test_eval_cli_reports_and_writes(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    assert main([]) == 0
+    assert "recall@5" in capsys.readouterr().out
+    doc = tmp_path / "EVALUATION.md"
+    doc.write_text(
+        "# EVALUATION\n\n| 指标 | 值 | 来源 |\n|---|---|---|\n"
+        "| KB recall@5 | 待填 | x |\n| KB MRR | 待填 | x |\n",
+        encoding="utf-8",
+    )
+    write_evaluation(Metrics(total=20, hits=18, recall_at_5=0.9, mrr=0.663), doc)
+    text = doc.read_text(encoding="utf-8")
+    assert "0.90" in text and "0.663" in text
+    assert "待填" not in text

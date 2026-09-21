@@ -18,6 +18,8 @@ from duty_agent.guardrails.sig001 import hits, scan
 from duty_agent.guardrails.source_adjudicator import QuotaMeter
 from duty_agent.memory.ingest import ingest
 from duty_agent.memory.store import KbStore
+from duty_agent.notify.cards import CardRenderer
+from duty_engine.aggregate import Stance
 from duty_engine.clock import SCHEDULE, TZ_SHANGHAI, VirtualClock
 from duty_engine.freeze import (
     Candidate,
@@ -38,6 +40,15 @@ from duty_engine.orders import (
     can_transition,
     save,
     transition,
+)
+from duty_engine.push_dispatcher import (
+    ALERT_CARD,
+    DAILY_SUMMARY,
+    INTRADAY_PROPOSAL,
+    MORNING_DECISION,
+    DispatchResult,
+    PushDispatcher,
+    PushEvent,
 )
 from duty_engine.storage import Alert, AlertLog, Archive, Store
 
@@ -122,6 +133,7 @@ class Planner:
     archive: Archive
     clock: VirtualClock
     alert_log: AlertLog
+    dispatcher: PushDispatcher
 
     @property
     def now(self) -> datetime:
@@ -360,6 +372,98 @@ class Planner:
             day.isoformat(),
         )
 
+    def push_morning(self, day: date, plan: Plan, pool: Pool) -> DispatchResult:
+        """08:45 计划锁定后发早盘决策卡（plan §9，1/日）。"""
+        numbers: dict[str, int] = {
+            "账户总值_分": pool.portfolio_cents(),
+            "订单数": len(plan.orders),
+        }
+        facts: list[str] = []
+        for target in plan.targets:
+            numbers[f"{target.code}_目标bps"] = target.target_bps
+            numbers[f"{target.code}_触发线_分"] = target.protect_trigger_cents
+            tail = "，极差≥2 已回落中性" if target.conflict else ""
+            facts.append(f"{target.code} {target.name}：{target.stance}（{target.votes} 票{tail}）")
+        facts += [f"移池淘汰 {code}：{reason}" for code, reason in pool.dropped]
+        comments = tuple(
+            line
+            for code in sorted({order.code for order in plan.orders})
+            for line in self.stance_summaries(day, code)
+        )
+        return self._dispatch(
+            MORNING_DECISION, f"{day.isoformat()} 计划已锁定", numbers, comments, tuple(facts)
+        )
+
+    def push_proposal(self, plan: Plan, code: str, stance: Stance, reason: str) -> DispatchResult:
+        """盘中提案卡（plan §9，≤4/日）。触发原因来自引擎判定，不是 agent 叙述。"""
+        target = next((t for t in plan.targets if t.code == code), None)
+        numbers: dict[str, int] = (
+            {}
+            if target is None
+            else {"现仓_bps": target.current_bps, "冻结触发线_分": target.protect_trigger_cents}
+        )
+        title = f"{code} 盘中提案：{stance}"
+        return self._dispatch(INTRADAY_PROPOSAL, title, numbers, (), (f"引擎判定：{reason}",))
+
+    def push_summary(self, day: date, plan: Plan, pool: Pool) -> DispatchResult:
+        """15:12 日报卡（plan §9，1/日）。数字一律引擎出，且只报引擎真算得出来的量。"""
+        numbers = {
+            "账户总值_分": pool.portfolio_cents(),
+            "目标仓位合计_bps": sum(target.target_bps for target in plan.targets),
+            "订单数": len(plan.orders),
+            "待人工确认": sum(1 for order in plan.orders if order.state is OrderState.APPROVED),
+            "风控否决": sum(1 for order in plan.orders if order.state is OrderState.REJECTED),
+        }
+        return self._dispatch(DAILY_SUMMARY, f"{day.isoformat()} 收盘", numbers)
+
+    def push_alert(self, kind: str, subject: str, detail: str) -> DispatchResult:
+        """告警卡（plan §9，不限次）。"""
+        return self._dispatch(ALERT_CARD, f"{kind} · {subject}", {}, (), (detail,))
+
+    def stance_summaries(self, day: date, code: str) -> list[str]:
+        """各决策实例对该标的的 stance 与理由摘要。卡片与确认页共用，一律标「评论」。"""
+        out: list[str] = []
+        for tag in self.settings.tags:
+            name = f"DECISION-{tag}.md"
+            if not self.archive.exists(day, name):
+                continue
+            grabbing = False
+            stance = reason = ""
+            for line in self.archive.read(day, name).splitlines():
+                if line.startswith("## "):
+                    if grabbing and stance:
+                        out.append(f"{tag}：{stance} — {reason}")
+                    grabbing = line[3:].strip().startswith(code)
+                    stance = reason = ""
+                elif grabbing and line.startswith("stance:"):
+                    stance = line.split(":", 1)[1].strip()
+                elif grabbing and line.startswith("reasoning:"):
+                    reason = line.split(":", 1)[1].strip()
+            if grabbing and stance:
+                out.append(f"{tag}：{stance} — {reason}")
+        return out
+
+    def _dispatch(
+        self,
+        kind: str,
+        subject: str,
+        numbers: dict[str, int],
+        comments: tuple[str, ...] = (),
+        facts: tuple[str, ...] = (),
+    ) -> DispatchResult:
+        event = PushEvent(
+            kind=kind,
+            at=self.now,
+            subject=subject,
+            numbers=numbers,
+            comments=comments,
+            facts=facts,
+            confirm_url=self.settings.confirm_base_url
+            if kind in (MORNING_DECISION, INTRADAY_PROPOSAL)
+            else "",
+        )
+        return self.dispatcher.dispatch(event)
+
     def confirm(self, order: Order, intent_id: str, *, to: OrderState = OrderState.QUEUED) -> Order:
         """唯一放行口：intent_id 必须来自真实用户轮次。"""
         verify(TurnLedger(self.settings.turn_ledger_path()), intent_id)
@@ -406,6 +510,11 @@ def build_planner(settings: Settings, day: date) -> Planner:
         archive=archive,
         clock=VirtualClock(datetime.combine(day, _DEADLINE.at, tzinfo=TZ_SHANGHAI)),
         alert_log=AlertLog(store, archive),
+        dispatcher=PushDispatcher(
+            outbox_dir=settings.outbox_dir,
+            renderer=CardRenderer(),
+            webhook_url=settings.wecom_webhook_url,
+        ),
     )
 
 

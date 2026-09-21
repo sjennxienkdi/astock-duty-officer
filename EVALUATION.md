@@ -4,8 +4,8 @@
 
 | 指标 | 值 | 来源 |
 |---|---|---|
-| 测试数 | 140 | `uv run pytest --collect-only -q` |
-| 覆盖率 | 95%（engine 90–100%，agent 92–100%） | `uv run pytest --cov=duty_agent --cov=duty_engine` |
+| 测试数 | 162 | `uv run pytest --collect-only -q` |
+| 覆盖率 | 96%（engine 90–100%，agent 92–100%） | `uv run pytest --cov=duty_agent --cov=duty_engine` |
 | KB recall@5 | 0.90（验收线 ≥ 0.8，18/20 命中） | `uv run python -m duty_agent.memory.eval` |
 | KB MRR | 0.663 | `uv run python -m duty_agent.memory.eval` |
 | 金标问题数 | 20 | `app/src/duty_agent/memory/eval_golden.json` |

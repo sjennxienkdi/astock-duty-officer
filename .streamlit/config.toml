@@ -1,0 +1,7 @@
+# 值班台配置。确认页是系统唯一放行口且无鉴权，因此默认只监听本机回环。
+[server]
+address = "127.0.0.1"
+headless = true
+
+[browser]
+gatherUsageStats = false
