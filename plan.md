@@ -24,13 +24,15 @@
 
 - **性质**：GitHub 求职展示项目，参考实现。真实生产系统是另一个仓库，本仓库不复用其代码。
 - **一句话定位**：基于 LangGraph Deep Agents 的多智能体 A 股值班系统——研究在盘后、决策在盘前、执行保护在盘中、复盘在盘后；LLM 只产判断不碰钱，每笔订单人工确认；全过程落档案、可回放、可检索。
-- **Definition of Done**：
-  - [ ] M1–M6 全部验收命令绿
-  - [ ] `uv run pytest -q` 全绿；`ruff`/`mypy` 零告警
-  - [ ] GitHub Actions 三个 workflow 绿
-  - [ ] README 首屏图 = §3 主链图（一字不改）
-  - [ ] `examples/replay-2026-09-16/` 可被 `web` 的 Replay 页完整回放
-  - [ ] 脱敏检查脚本 `scripts/check_secrets.py` 通过（§16）
+- **Definition of Done**（2026-09-21 落地核对）：
+  - [x] M1–M6 全部验收命令绿
+  - [x] `uv run pytest -q` 全绿（162 条）；`ruff`/`mypy` 零告警
+  - [ ] GitHub Actions 三个 workflow 绿 —— 仓库尚未推远端，已用本地等价命令全绿；
+    另 `lint.yml` 去掉 pre-commit 步骤，只跑白名单工具（见 DECISION-LOG）
+  - [x] README 首屏图 = §3 主链图（一字不改，由 `scripts/check_diagram.py` + `test_smoke` 守卫）
+  - [x] `examples/replay-2026-09-16/` 可被 `web` 的 Replay 页完整回放
+    （`test_replay_expands_every_archive_and_evidence` + `test_examples_match_golden_day_replay`）
+  - [x] 脱敏检查脚本 `scripts/check_secrets.py` 通过（§16）
 
 ---
 

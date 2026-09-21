@@ -25,7 +25,5 @@ jobs:
         run: uv run ruff format --check .
       - name: mypy strict
         run: uv run mypy .
-      - name: pre-commit
-        run: |
-          uv run pre-commit install --install-hooks
-          uv run pre-commit run --all-files
+      # .pre-commit-config.yaml 面向本地一次性检查；CI 直接跑同一套白名单工具，
+      # 不额外安装 pre-commit 本身（§10 依赖白名单）。
