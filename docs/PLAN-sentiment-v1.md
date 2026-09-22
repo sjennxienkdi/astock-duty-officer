@@ -142,11 +142,13 @@ MODEL_LADDER = [
     "bert_wwm",           # hfl/chinese-bert-wwm-ext 微调
     "bert_wwm_distill",   # bert_wwm 架构 + Jev 软标签蒸馏
     "rf_meta",            # RandomForest on 混合元特征（含 Jev 概率作为特征）
+    "qwen_qlora",         # Qwen2.5-7B-Instruct QLoRA(4-bit) 微调（M7 · 投递后补强档，2026-09-22 增补）
 ]
 ```
 
-注意 `MODEL_LADDER` 长度是 9（含 `dict_rule` 与两个派生），文档里说"7 级阶梯"指的是
-`dict_rule → tfidf_lr → tfidf_rf/tfidf_lgbm → fasttext → textcnn → bert_wwm → rf_meta` 这 7 级能力台阶。
+注意 `MODEL_LADDER` 长度是 10（含 `dict_rule` 与两个派生），文档里说"8 级阶梯"指的是
+`dict_rule → tfidf_lr → tfidf_rf/tfidf_lgbm → fasttext → textcnn → bert_wwm → rf_meta → qwen_qlora` 这 8 级能力台阶。
+`qwen_qlora` 列在 M7 完成前允许留空并在表中注明「M7 未执行」。
 
 ### 2.5 指标名（JSON key / 表格列名，一字不改）
 
@@ -414,12 +416,19 @@ def label_batch(samples: list[Sample], batch_size: int = 40,
 | `bert_wwm` | `hfl/chinese-bert-wwm-ext`，`max_len=256, bs=16, grad_accum=2, fp16, lr=2e-5, epochs<=4` 早停 1 | **硬件约束见下** |
 | `bert_wwm_distill` | 同架构，loss = `0.5·CE(hard) + 0.5·KL(student ‖ jev_soft)`，`T=2.0` | 需 Jev 概率 |
 | `rf_meta` | 特征 = TF-IDF SVD(128) + 元特征(§5.8) + Jev 四问概率(若可用) | Jev 概率**作为特征而非判决** |
+| `qwen_qlora` | Qwen2.5-7B-Instruct，QLoRA 4-bit NF4 + 双量化；`r=16, α=32`，目标模块 = q/k/v/o + gate/up/down 全线性投影；`max_len=512, bs=1 × grad_accum=16`，梯度检查点必开；`lr=1e-4, epochs<=3` cosine；解码约束为三标签 token，概率 = 三标签 logit 归一（保住与校准层的接口） | **M7 执行，依赖仅 M0–M2**；硬件与回退见下 |
 
 **硬件红线（实现者必读）**：目标机器为 RTX 3060 Laptop **6GB VRAM** + 16GB RAM。因此：
 - BERT 微调必须 `fp16` + `max_len ≤ 256` + `per_device_batch ≤ 16`，OOM 时先降 `max_len` 到 128 再降 batch，**不许改成 CPU 跑完事**（会跑到超时）。
-- 不允许引入 DeBERTa-v3-large / RoBERTa-large 等 >350M 参数模型。
+- 不允许引入 DeBERTa-v3-large / RoBERTa-large 等 >350M 参数的**判别式**编码器（`qwen_qlora` 档的 7B 生成式模型经 4-bit 量化后不受此条限制，见下）。
 - TF-IDF SVD 与 RF 的 `n_jobs` 上限 6，避免 16GB 内存打爆。
 - 全部 BERT 实验必须支持 `--subset N` 参数在小样本上先验证流水线，再上全量。
+
+**`qwen_qlora` 档硬件账（实现者必读）**：RTX 3060 Laptop 6GB 下，7B 4-bit 权重约 4.0GB，
+加 LoRA 参数、优化器状态与激活（梯度检查点 + seq 512 + bs 1）峰值约 **5.5–6.2GB，属边缘可行**。
+OOM 处置顺序（依次尝试，每步记录进 manifest）：`max_len` 512→384 → （bs 已为 1）→
+**降级 Qwen2.5-3B-Instruct（约 3.5GB 稳态）**，降级必须在 `manifest.json` 与 README 如实注明实际规格。
+权重经 ModelScope 或 `HF_ENDPOINT=https://hf-mirror.com` 下载至本地缓存目录，缓存与权重一律不入 git。
 
 ### 5.8 `rf_meta` 元特征（冻结列表）
 
@@ -464,7 +473,7 @@ def calibration_report(probs, y_true, n_bins: int = 15) -> dict: ...
 ### 6.2 主表：标签源消融（`sentiment/reports/label_source_ablation.md`）
 
 行 = `LABEL_SOURCES` 中可用于训练的 3 个（`dict`/`market`/`jev`）+ 组合 `market+jev`，共 4 行；
-列 = `MODEL_LADDER` 中 9 个模型。单元格 = `macro_f1`（真值 `human`）。
+列 = `MODEL_LADDER` 中 10 个模型（`qwen_qlora` 列在 M7 完成后补入，未完成时留空并注明）。单元格 = `macro_f1`（真值 `human`）。
 
 必须额外给出：
 - 每格样本量（`human` 金标条数），金标 < 200 条的格子标注 ⚠；
@@ -485,7 +494,7 @@ def calibration_report(probs, y_true, n_bins: int = 15) -> dict: ...
 
 ```
 fig_confusion_{model}__{source}.png
-fig_ablation_heatmap.png           # 4×9 主表热力图
+fig_ablation_heatmap.png           # 4×10 主表热力图（M7 前为 4×9，qwen_qlora 列留空注明）
 fig_jev_vs_market_confusion.png
 fig_reliability_{model}.png        # 校准前后双子图
 fig_cost_f1_frontier.png           # 帕累托前沿，点标注模型名
@@ -498,7 +507,8 @@ fig_kappa_bar.png                  # 三组 κ 对比 + CI 误差棒
 
 x 轴 `cost_per_1k_cny`（训练成本摊销 + 推理成本，推理按 10 万条计），y 轴 `macro_f1`。
 必须包含：每个模型的推理延迟 p50/p99、是否需要联网、是否可离线复现（是/否）。
-**结论段必须明确回答**："在什么 QPS 与预算下应该直接调 Jev，什么情况下应该用蒸馏学生。"
+`qwen_qlora` 档完成后必须补入对比结论：相对 `bert_wwm` 的 `macro_f1` 增量是否值得其训练摊销与推理成本。
+**结论段必须明确回答**："在什么 QPS 与预算下应该直接调 Jev，什么情况下应该用蒸馏学生，什么情况下值得上 `qwen_qlora`。"
 
 ### 6.6 验收线（诚实优先）
 
@@ -509,6 +519,7 @@ x 轴 `cost_per_1k_cny`（训练成本摊销 + 推理成本，推理按 10 万�
 | `kappa(jev, human)` | 记录实测值，**无下限** | 低于 0.4 时必须在 README 显著位置说明 Jev 在本任务上不适用 |
 | `bert_wwm_distill` vs `bert_wwm` | `distill_retention_ratio ≥ 0.95` | 未达标则说明 Jev 软标签信息量不足 |
 | ECE（校准后，`bert_wwm`） | ≤ 0.08 | 换 Platt / 增加 bins，仍不达则如实报告 |
+| `qwen_qlora` on `market` → `macro_f1`(human) | 无下限，**必须与 `bert_wwm` 同表可比** | 打平或跑输均如实写入「诚实记录」；OOM 降级 3B 须注明实际规格 |
 | `run_all.py --backend synthetic` | 30 分钟内跑完 | 超时先查是否误开了真实数据 |
 
 ---
@@ -625,6 +636,7 @@ dependencies = [
 
 [project.optional-dependencies]
 serve = ["fastapi", "uvicorn"]       # 仅调试端点，Agent 主路径不依赖
+qlora = ["peft", "bitsandbytes"]     # 仅 M7 qwen_qlora 档；CI 的 sentiment-cpu job 不安装此组
 
 [build-system]
 requires = ["hatchling"]
@@ -647,7 +659,9 @@ dev 依赖（`pytest`/`pytest-cov`/`ruff`/`mypy`）沿用仓库根 `[dependency-
 
 **禁止引入**：`openai`/`anthropic`/`zhipuai` 等 LLM SDK 直接进主流程（`llmlabel.py` 只允许一个，且必须在
 `sentiment/configs/base.yaml` 里显式声明 `llm_xcheck.provider`，默认 `disabled`）；`fastdtw`、`dtaidistance`；
-`peft`/`loralib`（6GB 显存下全参微调 110M 的 BERT-wwm 完全可行，上 LoRA 只增加解释成本）；
+`loralib`；`peft`/`bitsandbytes` **仅允许用于 `qwen_qlora` 档（M7，经 `qlora` 可选依赖组安装）**——
+BERT-wwm 110M 仍走全参微调（6GB 下完全可行，上 LoRA 只增加解释成本），7B 则必须 4-bit QLoRA（全参在 6GB 物理不可行）。
+两条路线刻意并存：LoRA 不是默认选项，而是显存约束下的选择，这个对比本身是面试叙事的一部分；
 任何 AutoML 框架（`autogluon`/`auto-sklearn`/`flaml`）——本项目要展示的是手工建模能力，用 AutoML 直接失去意义。
 
 ---
@@ -771,6 +785,26 @@ astock-duty-officer/
   `uv run python -c "from duty_sentiment.tool import sentiment_score as s; r=s('公司三季度净利润同比增长45%，超出市场预期', code='600000'); assert abs(sum(r.probability.values())-1)<0.01 and r.calibrated; print(r)"` 通过；
   `uv run python sentiment/scripts/run_all.py --backend synthetic` 无网络通过。
 
+### M7 `qwen_qlora` 档（LoRA 实战 · **投递后补强**，2026-09-22 增补）
+
+> **依赖仅 M0–M2**（合成/真实数据 + `dict`/`market` 标签），**不依赖 M3–M6**，允许在 M2 后直接执行——
+> 对应总控排期「投递后补强：MS0+M2 → 本档」。目的：财经新闻利空利多判断的 7B QLoRA 微调实战，
+> 补齐 LoRA/QLoRA 题库的动手凭据；指标上不设必须赢的线，价值在「与 BERT 档同表可比 + 成本前沿定位」。
+
+- 新增 `qlora_train.py`（§5.7 冻结配置：模型、量化、r/α、目标模块、`max_len`、lr、epochs 全部入 manifest）
+  与 `qlora_infer.py`（4-bit + adapter 合并推理，输出三标签概率，接既有 `calibrate.py` 校准层）。
+- `sentiment/scripts/m7_qlora.py --source market --subset 1000` 先小样本验证流水线，再上全量（同 BERT 的 `--subset` 纪律）。
+- **预训练污染敏感性实验对 Qwen 重做一遍**（§13.2.3：Qwen 预训练语料见过中文财经新闻的概率远高于 BERT-wwm，
+  「test 换预训练截止日之后时段」的两次 `macro_f1` 差值写进 `LEAKAGE.md`）。
+- 权重与 LoRA adapter 存放 `sentiment/out/{run_id}/models/qwen_qlora/`，**不入 git**；公开仓库只提交
+  manifest 指纹 + 训练曲线 + 指标 JSON。
+- **验收**：
+  `uv run pytest -q tests/sentiment/test_qlora.py` 绿（配置冻结断言 + 标签 schema 往返两条，遵循 §11 允许加规则）；
+  `uv run python sentiment/scripts/m7_qlora.py --source market --subset 1000` 在 GPU 不 OOM
+  （或按 §5.7 回退顺序降级 3B 并在 manifest 与 README 注明实际规格）；
+  `sentiment/out/latest/metrics/qwen_qlora__market.json` 含 §2.5 全部指标键，真值 `human`；
+  `label_source_ablation.md` 与 `cost_frontier.md` 补入 `qwen_qlora` 行/列，与 `bert_wwm` 的差值写入「诚实记录」。
+
 ## 11. 测试清单（名字冻结，允许加不允许删/skip）
 
 > 全部位于 `tests/sentiment/`。带 `[gpu]` 注释的测试在 CI 的 `sentiment-cpu` job 中不执行。
@@ -866,9 +900,10 @@ tests/agent/test_sentiment_tool.py::test_sentiment_never_produces_stance_or_posi
 1. **时间切分**：只能 `temporal_split`。任何 `train_test_split(shuffle=True)` 出现即返工。
 2. **跨切分近似去重**：`dup_clusters.json` 的 `cross_split_removed` 必须非空检查通过；
    实测移除条数写入 `LEAKAGE.md`。若为 0，说明 `dedup.threshold` 太严，需报告阈值敏感性（0.7/0.8/0.9 三档）。
-3. **预训练污染**：`bert_wwm` 的预训练语料可能已见过 test 期新闻。必须做敏感性实验：
+3. **预训练污染**：`bert_wwm` 与 `qwen_qlora`（Qwen 预训练语料覆盖中文财经新闻的概率更高，M7 验收项）
+   的预训练语料可能已见过 test 期新闻。必须做敏感性实验：
    把 test 换成「预训练截止日之后的时间段」重跑一次，两次 `macro_f1` 差值写进 `LEAKAGE.md`。
-   差值 > 0.05 时在 README 显著位置声明 BERT 结果可能被污染高估。
+   差值 > 0.05 时在 README 显著位置声明对应模型的结果可能被污染高估。
 4. **`market` 标签本身用了未来价格**：因此它训练的模型在 `market` 真值下评测必然虚高。
    主表真值永远是 `human`，这条已在 §6.1 固化，并有测试 `test_human_only_truth_raises_on_market` 兜底。
 
